@@ -10,7 +10,7 @@ A Simple and porpousely vulnerable django web-application for testing and learni
 ## Main Vulnerabilities
 
 ### Illegal File Access
-* Profile pictures are stored as static files in the site with standardized name `user_(user_id)avatar`. They appear in the User's profile as a thumbnail. "Full Resolution" pictures are accessible by using their filename, e.g. `headpage.example/social/static?file=user1_avatar.jpg` The `file` in the GET is not properly validated/sanitized
+* Profile pictures are stored as static files in the site with standardized name `(username)_avatar`. They appear in the User's profile as a thumbnail. "Full Resolution" pictures are accessible by using their filename, e.g. `headpage.example/social/static?file=user1_avatar.jpg` The `file` in the GET is not properly validated/sanitized
 
 ### SQL Injection
 * User pages are accessible using paramters "headpage.example/user?id=1". The parameter is used in a raw SQL SELECT, to load the user's data for the page

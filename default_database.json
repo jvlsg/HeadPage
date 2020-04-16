@@ -1,0 +1,24 @@
+[
+  {
+    "model": "social.user",
+    "pk": 1,
+    "fields": {
+      "first_name" : "Arnaldo",
+      "last_name" : "Bernaldo",
+      "username" : "mega_mano",
+      "password": "4015bc9ee91e437d90df83fb64fbbe312d9c9f05",
+      "about": "I like trains"
+    }
+  },
+  {
+    "model": "social.user",
+    "pk": 2,
+    "fields": {
+      "first_name" : "Cernalda",
+      "last_name" : "Bernaldo",
+      "username" : "mega_mana",
+      "password": "50a4e988380c09d290acdab4bd53d24ee7b497df",
+      "about": "I like wagons"
+    }
+  }
+]
