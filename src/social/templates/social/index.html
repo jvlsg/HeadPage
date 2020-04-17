@@ -1,12 +1,15 @@
 <!-- {% load static %} -->
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'poll/style.css' %}"> -->
 
-{% if latest_question_list %}
+{% if users_alphabetical_list %}
     <ul>
-    {% for question in latest_question_list %}
-        <li><a href="{% url 'poll:detail' question.id %}">{{ question.from django.utils import timezone }}</a></li>
+    {% for user in users_alphabetical_list %}
+        <!-- Search for a URLConf path with the name 'profile', pass the function/method it calls the argument user.username -->
+        <li> <a href="{% url 'social:profile' user.username %}">
+            {{user.username}} ({{user.last_name}}, {{user.first_name}})
+        </a> </li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No polls are available.</p>
-{% endif %}from django.utils import timezone
+    <p>No users found!.</p>
+{% endif %}
