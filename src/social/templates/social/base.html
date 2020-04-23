@@ -77,10 +77,10 @@
             <a href="{% url 'social:index' %}">Home</a>
 
             {% if request.session.user_id == None %}
-            <a href="{% url 'social:login' %}">Log-in</a>
-            <a href="{% url 'social:register' %}">Sign-up</a>
+            <a href="{% url 'social:login' %}?redirect={{request.get_full_path}}">Log-in</a>
+            <a href="{% url 'social:register' %}?redirect={{request.get_full_path}}">Sign-up</a>
             {% else %}
-            <a href="{% url 'social:logout' %}">Log-out</a>
+            <a href="{% url 'social:logout'%}?redirect={{request.get_full_path}}">Log-out</a>
             {% endif %}
         {% endblock %}
     </div>

@@ -8,7 +8,8 @@
         <ul>
         {% for user in users_alphabetical_list %}
             <!-- Search for a URLConf path with the name 'profile', pass the function/method it calls the argument user.username -->
-            <li> <a href="{% url 'social:profile' user.username %}">
+            <!-- <li> <a href="{#% url 'social:profile' user.username %#}"> -->
+            <li> <a href="profile/?username={{user.username}}">
                 {{user.username}} ({{user.last_name}}, {{user.first_name}})
             </a> </li>
         {% endfor %}
