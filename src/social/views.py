@@ -1,38 +1,55 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, Http404
 from django.urls import reverse
-from django.template import loader
+#from django.template import loader
+from django.conf import settings
 from django.views import generic
 from .models import User
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, EditProfileForm
 import hashlib
+import subprocess
+import os
 from django.db import connection
-from pprint import pprint
 from .auth import authenticate_user, get_user
-# # Create your views here.
+
 class IndexView(generic.ListView):
     template_name = 'social/index.html'
     context_object_name = 'users_alphabetical_list'
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return User.objects.order_by('username')[:5]
+        try:
+            return User.objects.order_by('username')[:5]
+        except django.db.utils.OperationalError:
+            return None
 
 def user_profile(request):
-    try:
-        #Check GET params 
-        username=request.GET.get('username')
-        #+++ VULNERABLE TO SQL INJECTION+++
-        retrieved_user = list(User.objects.raw("SELECT  * FROM social_user WHERE username='{}'".format(username)))[0]
-    except:
-        raise Http404("Profile does not exist")
-
     logged_user = get_user(request.session.get('user_id'))
-    if logged_user == retrieved_user:
-        ##TODO Form for editing
-        #Form = ...
+
+    if request.POST:
+        form = EditProfileForm(request.POST)
+        if form.is_valid():
+            pic_url = form.cleaned_data["profile_picture_from_url"]
+            print(">>>"+pic_url)
+            if len(pic_url)>0:
+                # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
+                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+logged_user.username), shell=True)
         return HttpResponse("Welcome to your page, "+logged_user.first_name)
-    return render(request, 'social/profile.html', {'user': retrieved_user})
+    
+    elif request.GET:
+        try:
+            #Check GET params 
+            username=request.GET.get('username')
+            #+++ VULNERABLE TO SQL INJECTION+++
+            profile_user = list(User.objects.raw("SELECT  * FROM social_user WHERE username='{}'".format(username)))[0]
+        except:
+            raise Http404("Profile does not exist")
+
+        form = None
+        if logged_user == profile_user:
+            form = EditProfileForm()
+            #TODO list user uploaded files
+        return render(request, 'social/profile.html', {'user': profile_user,'edit_profile_form':form})
 
 def register(request):
     if request.method == 'POST':
@@ -56,7 +73,7 @@ def register(request):
                         username,password,first_name,last_name)
                 )
                 #+++ VULNERABLE TO UNVALIDATED REDIRECTS +++
-                return HttpResponseRedirect(url_to_redirect)
+                return redirect(url_to_redirect)
             #--- Generic exception = bad practice! ---
             except Exception as e:
                 form = RegisterForm()
@@ -72,7 +89,7 @@ def login(request):
         form = LoginForm(request.POST)
         error_message = ""
         if form.is_valid():
-            user = authenticate_user(request)
+            user = authenticate_user(form.cleaned_data["username"],form.cleaned_data["password"])
             if user != None:
                 request.session['user_id'] = user.id
                 return redirect(url_to_redirect)

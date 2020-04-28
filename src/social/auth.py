@@ -7,12 +7,11 @@ from .models import User
 import hashlib
 
 
-def authenticate_user(request):
+def authenticate_user(username,password):
     """
     This is a warped clone of an authenticate as defined in the 
     """
-    username=request.POST.get('username')
-    password=hashlib.sha1(request.POST.get('password').encode()).hexdigest()
+    password=hashlib.sha1(password.encode()).hexdigest()
     try:
         # +++ VULNERABLE TO SQL INJECTION +++
         q = list(User.objects.raw("SELECT * FROM social_user WHERE username='{}' AND password='{}' LIMIT 1".format(username,password)))

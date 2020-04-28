@@ -18,7 +18,7 @@ A Simple and porpousely vulnerable django web-application for testing and learni
 
 ### Remote Code Execution
 * (based on the django.nV injection vuln) The user can upload a file and give an arbitrary name (or rename already uploaded files). When first uploaded the files are stored in a temporary folder, before being moved to a `userfiles` folder by invoking `mv` from the `os`. The rename is also done with `mv`. This process is vulnerable to code injection in the new file name, or replacing an existing program with a malicious version, such as `/bin/ls`
-* The user can choose a picture already uploaded for his profile picture, or download an image from a URL. The download done by invoking `wget` without escaping the user input or validating the filetype. 
+* The user can choose a picture already uploaded for his profile    , or download an image from a URL. The download done by invoking `wget` without escaping the user input or validating the filetype. 
 
 ### Open Redirect
 * When clicking the link to the login page from a previous page, the previous Page URL is sent as a Parameter for a redirection back to the previous page after loging in. The redirection URL is not validated. E.g. in the index, the link goes to headpage.example/login?redirect=headpage.example/index 
