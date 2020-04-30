@@ -1,91 +1,29 @@
 {% autoescape off %} <!-- +++ THIS WILL MAKE THE SITE VULNERABLE TO XSS +++ -->
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css"  href="{% static "social/style.css" %}">
     <title>{% block title %}HeadPage{% endblock %}</title>
-    <style>
-        * {
-        box-sizing: border-box;
-        }
-    
-        body {
-        font-family: Arial, Helvetica, sans-serif;
-        }
-    
-        /* Style the header */
-        header {
-        background-color: #666;
-        padding: 30px;
-        text-align: center;
-        font-size: 35px;
-        color: white;
-        }
-    
-        /* Create two columns/boxes that floats next to each other */
-        nav {
-        float: left;
-        width: 30%;
-        height: 300px; /* only for demonstration, should be removed */
-        background: #ccc;
-        padding: 20px;
-        }
-    
-        /* Style the list inside the menu */
-        nav ul {
-        list-style-type: none;
-        padding: 0;
-        }
-    
-        article {
-        float: left;
-        padding: 20px;
-        width: 70%;
-        background-color: #f1f1f1;
-        height: 300px; /* only for demonstration, should be removed */
-        }
-    
-        /* Clear floats after the columns */
-        section:after {
-        content: "";
-        display: table;
-        clear: both;
-        }
-    
-        /* Style the footer */
-        footer {
-        background-color: #777;
-        padding: 10px;
-        text-align: center;
-        color: white;
-        }
-    
-        /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
-        @media (max-width: 600px) {
-        nav, article {
-            width: 100%;
-            height: auto;
-        }
-        }
-        </style>
+
 </head>
 
 <body>
     <div class="nav">
         {% block sidebar %}
-            <a href="{% url 'social:index' %}">Home</a>
-
-            {% if request.session.user_id == None %}
-            <a href="{% url 'social:login' %}?redirect={{request.get_full_path}}">Log-in</a>
-            <a href="{% url 'social:register' %}?redirect={{request.get_full_path}}">Sign-up</a>
-            {% else %}
-            <a href="{% url 'social:logout'%}?redirect={{request.get_full_path}}">Log-out</a>
-            {% endif %}
+        <ul class="nav">
+            <l1><a class="nav" href="{% url 'social:index' %}">Home</a></l1>
+            <l1>{% if request.session.user_id == None %}</l1>
+            <l1><a class="nav" href="{% url 'social:login' %}?redirect={{request.get_full_path}}">Log-in</a></l1>
+            <l1><a class="nav" href="{% url 'social:register' %}?redirect={{request.get_full_path}}">Sign-up</a></l1>
+            <l1>{% else %}</l1>
+            <l1><a class="nav" href="{% url 'social:logout'%}?redirect={{request.get_full_path}}">Log-out</a></l1>
+            <l1>{% endif %}</l1>
+        </ul>
         {% endblock %}
     </div>
 
-    <div id="content">
+    <div id="content" class="content">
         {% block content %}{% endblock %}
     </div>
 </body>

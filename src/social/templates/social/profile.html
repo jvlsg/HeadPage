@@ -1,7 +1,6 @@
 {% extends 'social/base.html' %}
 {% block title %} {{user.username}}'s profile{% endblock %}
 {% block content %}
-{% load static %}
 
 {% if edit_profile_form %}
     <form action="{% url 'social:profile' %}?username={{user.username}}" method="POST">

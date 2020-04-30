@@ -1,0 +1,121 @@
+/* 
+Blue
+#78aef5
+#413b97
+
+Orange
+#f5bf78
+#d13800
+
+Pink-red-thing
+#e10058
+*/
+
+* {
+box-sizing: border-box;
+}
+
+*.content {   
+    margin-top: 40px;
+    float: left;
+    width: 100%;
+}
+
+
+body {
+font-family: Arial, Helvetica, sans-serif;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%
+}
+
+/* Create two columns/boxes that floats next to each other */
+nav {
+    float: center;
+    width: 30%;
+    height: 300px; /* only for demonstration, should be removed */
+    background-color: white;
+    padding: 20px;
+}
+    
+/* Style the list inside the menu */
+ul.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;    
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #78aef5;
+}
+
+ul.nav li {
+    float: left;
+    color: white;
+    display: block;
+    padding: 20;
+}  
+
+a.nav {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;  
+}
+
+a.nav:hover {
+    background-color: #413b97;
+}
+
+
+a.user_list_item{
+    border: 1px solid #ddd;
+    margin-top: -1px; 
+    padding: 12px;
+    text-decoration: none;
+    font-size: 18px;
+    color: black;
+    color: black;
+    display: inline-block;
+    width: 100%;
+}
+a.user_list_item:hover{
+    background-color: #f5bf78;
+}
+
+a.user_list_item img{
+    margin-right: 5%;
+}
+
+input {
+display: inline-block;
+margin: 8px 0;
+padding: 12px 20px;
+box-sizing: border-box; 
+width: 100%;
+}
+
+input:focus {
+    border: 2px solid #f5bf78;
+}
+
+input[type=submit] {
+width: 100%;
+background-color: #78aef5;
+color: white;
+padding: 14px 20px;
+margin: 8px 0;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+input[type=submit]:hover {
+background-color: #413b97;
+}
+  

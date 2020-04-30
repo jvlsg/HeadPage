@@ -2,7 +2,7 @@
 {% block title %} Register {% endblock %}
 
 {% block content %}
-<form action="{% url 'social:login' %}" method="POST">
+<form class="center" action="{% url 'social:login' %}" method="POST">
     <!-- TODO +++ VULNERABLE TO CSRF +++ -->
     {% csrf_token %}
     {{form}}
