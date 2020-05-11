@@ -11,9 +11,7 @@
             <!-- <li> <a href="{#% url 'social:profile' user.username %#}"> -->
             <li style="list-style-type: none"> 
                 <a class="user_list_item" href="profile/?username={{user.username}}"> 
-                    {% with PIC_PATH='/static/social/'|add:user.username|add:'.jpg' %}
-                    <img src={{ PIC_PATH }} height="5%" width="5%" alt="Profile picture">
-                    {% endwith %}
+                    <img src="{{ MEDIA_URL}}avatars/{{user.username}}.jpg" height="5%" width="5%" alt="Profile picture">
                     {{user.username}} ({{user.last_name}}, {{user.first_name}})
                 </a>
             </li>

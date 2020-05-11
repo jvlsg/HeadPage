@@ -30,10 +30,9 @@ def user_profile(request):
         form = EditProfileForm(request.POST)
         if form.is_valid():
             pic_url = form.cleaned_data["profile_picture_from_url"]
-            print(">>>"+pic_url)
             if len(pic_url)>0:
                 # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
-                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+logged_user.username), shell=True)
+                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.username), shell=True)
         return HttpResponse("Welcome to your page, "+logged_user.first_name)
     
     elif request.GET:
@@ -91,6 +90,7 @@ def login(request):
         if form.is_valid():
             user = authenticate_user(form.cleaned_data["username"],form.cleaned_data["password"])
             if user != None:
+                print("redirecting to:{}".format(url_to_redirect))
                 request.session['user_id'] = user.id
                 return redirect(url_to_redirect)
             form = LoginForm()
