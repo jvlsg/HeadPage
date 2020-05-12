@@ -6,7 +6,6 @@ from django.conf import settings
 from django.views import generic
 from .models import User
 from .forms import RegisterForm, LoginForm, EditProfileForm
-import hashlib
 import subprocess
 import os
 from django.db import connection
@@ -26,15 +25,30 @@ class IndexView(generic.ListView):
 def user_profile(request):
     logged_user = get_user(request.session.get('user_id'))
 
-    if request.POST:
+    if request.POST and logged_user != None:
         form = EditProfileForm(request.POST)
         if form.is_valid():
+            # There are better ways to check for differences and update a model using a form
+            # Check out the ModelForm() in the docs.
             pic_url = form.cleaned_data["profile_picture_from_url"]
+            new_password = form.cleaned_data["password"]
+            
             if len(pic_url)>0:
                 # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
                 subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.username), shell=True)
-        return HttpResponse("Welcome to your page, "+logged_user.first_name)
-    
+            else:
+                #TODO file upload
+                # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
+                pass
+            if len(new_password) > 0:
+                logged_user.password = auth.get_password_hash(new_password)
+            logged_user.first_name = form.cleaned_data["first_name"]
+            logged_user.last_name = form.cleaned_data["last_name"]
+            logged_user.about = form.cleaned_data["about"]
+            logged_user.save()
+            return redirect(reverse("social:profile")+"?username={}".format(logged_user.username))
+        return redirect(reverse("social:index"))
+
     elif request.GET:
         try:
             #Check GET params 
@@ -46,7 +60,10 @@ def user_profile(request):
 
         form = None
         if logged_user == profile_user:
-            form = EditProfileForm()
+            form = EditProfileForm(initial= {
+                    "first_name":logged_user.first_name,
+                    "last_name":logged_user.last_name,
+                    "about":logged_user.about,})
             #TODO list user uploaded files
         return render(request, 'social/profile.html', {'user': profile_user,'edit_profile_form':form})
 
@@ -63,8 +80,7 @@ def register(request):
             last_name=request.POST.get('last_name')
 
             #+++ PASSWORD HASHED ON THE SERVERSIDE +++
-            #+++ USE OF BROKEN HASH FUNCTION SHA1 +++
-            password=hashlib.sha1(request.POST.get('password').encode()).hexdigest()                    
+            password=auth.get_password_hash(request.POST.get('password'))
             try:
                 # +++ VULNERABLE TO SQL INJECTION +++
                 curs.executescript(
@@ -84,13 +100,13 @@ def register(request):
 
 def login(request):
     if request.method=='POST':
+        #+++ VULNERABLE TO UNVALIDATED REDIRECTS +++
         url_to_redirect = request.session.pop("login_redirect",reverse('social:index'))
         form = LoginForm(request.POST)
         error_message = ""
         if form.is_valid():
             user = authenticate_user(form.cleaned_data["username"],form.cleaned_data["password"])
             if user != None:
-                print("redirecting to:{}".format(url_to_redirect))
                 request.session['user_id'] = user.id
                 return redirect(url_to_redirect)
             form = LoginForm()

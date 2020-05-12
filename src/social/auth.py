@@ -6,6 +6,9 @@ But don't do this, It's hackish, and ugly
 from .models import User
 import hashlib
 
+def get_password_hash(password):
+    #+++ USE OF BROKEN HASH FUNCTION SHA1 +++
+    return hashlib.sha1(password.encode()).hexdigest()
 
 def authenticate_user(username,password):
     """
