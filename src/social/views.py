@@ -10,6 +10,7 @@ import subprocess
 import os
 from django.db import connection
 from .auth import authenticate_user, get_user
+from .storage import write_file
 
 class IndexView(generic.ListView):
     template_name = 'social/index.html'
@@ -22,11 +23,12 @@ class IndexView(generic.ListView):
         except django.db.utils.OperationalError:
             return None
 
+#God, just LOOK at this mess
 def user_profile(request):
     logged_user = get_user(request.session.get('user_id'))
 
     if request.POST and logged_user != None:
-        form = EditProfileForm(request.POST)
+        form = EditProfileForm(request.POST,request.FILES)
         if form.is_valid():
             # There are better ways to check for differences and update a model using a form
             # Check out the ModelForm() in the docs.
@@ -36,12 +38,15 @@ def user_profile(request):
             if len(pic_url)>0:
                 # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
                 subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.username), shell=True)
-            else:
-                #TODO file upload
+            
+            #File uploaded in the field
+            elif(request.FILES["profile_picture_from_file"]):
                 # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                pass
+                write_file(request.FILES["profile_picture_from_file"],'{}.jpg'.format(settings.MEDIA_ROOT+"/avatars/"+logged_user.username))
+
             if len(new_password) > 0:
                 logged_user.password = auth.get_password_hash(new_password)
+            
             logged_user.first_name = form.cleaned_data["first_name"]
             logged_user.last_name = form.cleaned_data["last_name"]
             logged_user.about = form.cleaned_data["about"]

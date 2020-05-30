@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 {% if edit_profile_form %}
-    <form action="{% url 'social:profile' %}?username={{user.username}}" method="POST">
+    <form action="{% url 'social:profile' %}?username={{user.username}}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         {{edit_profile_form}}
         <input type="submit" value="Update Profile">
