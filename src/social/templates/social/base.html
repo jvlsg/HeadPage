@@ -17,6 +17,7 @@
             <l1><a class="nav" href="{% url 'social:login' %}?redirect={{request.get_full_path}}">Log-in</a></l1>
             <l1><a class="nav" href="{% url 'social:register' %}?redirect={{request.get_full_path}}">Sign-up</a></l1>
             <l1>{% else %}</l1>
+            <l1><a class="nav" href="{% url 'social:profile'%}?userid={{request.session.user_id}}">Profile</a></l1>
             <l1><a class="nav" href="{% url 'social:logout'%}?redirect={{request.get_full_path}}">Log-out</a></l1>
             <l1>{% endif %}</l1>
         </ul>

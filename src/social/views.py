@@ -37,12 +37,12 @@ def user_profile(request):
             
             if len(pic_url)>0:
                 # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
-                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.username), shell=True)
+                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.id), shell=True)
             
             #File uploaded in the field
-            elif(request.FILES["profile_picture_from_file"]):
+            elif request.FILES.get("profile_picture_from_file",None) != None:
                 # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                write_file(request.FILES["profile_picture_from_file"],'{}.jpg'.format(settings.MEDIA_ROOT+"/avatars/"+logged_user.username))
+                write_file(request.FILES["profile_picture_from_file"],'{}.jpg'.format(settings.MEDIA_ROOT+"/avatars/"+logged_user.id))
 
             if len(new_password) > 0:
                 logged_user.password = auth.get_password_hash(new_password)
@@ -51,15 +51,15 @@ def user_profile(request):
             logged_user.last_name = form.cleaned_data["last_name"]
             logged_user.about = form.cleaned_data["about"]
             logged_user.save()
-            return redirect(reverse("social:profile")+"?username={}".format(logged_user.username))
+            return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
         return redirect(reverse("social:index"))
 
     elif request.GET:
         try:
             #Check GET params 
-            username=request.GET.get('username')
+            userid=request.GET.get('userid')
             #+++ VULNERABLE TO SQL INJECTION+++
-            profile_user = list(User.objects.raw("SELECT  * FROM social_user WHERE username='{}'".format(username)))[0]
+            profile_user = list(User.objects.raw("SELECT  * FROM social_user WHERE id='{}'".format(userid)))[0]
         except:
             raise Http404("Profile does not exist")
 

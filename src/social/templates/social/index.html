@@ -10,8 +10,8 @@
             <!-- Search for a URLConf path with the name 'profile', pass the function/method it calls the argument user.username -->
             <!-- <li> <a href="{#% url 'social:profile' user.username %#}"> -->
             <li style="list-style-type: none"> 
-                <a class="user_list_item" href="profile/?username={{user.username}}"> 
-                    <img src="{{ MEDIA_URL}}avatars/{{user.username}}.jpg" height="5%" width="5%" alt="Profile picture">
+                <a class="user_list_item" href="profile/?userid={{user.id}}"> 
+                    <img src="{{ MEDIA_URL}}avatars/{{user.id}}.jpg" height="5%" width="5%" alt="Profile picture">
                     {{user.username}} ({{user.last_name}}, {{user.first_name}})
                 </a>
             </li>

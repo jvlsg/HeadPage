@@ -3,14 +3,14 @@
 {% block content %}
 {% load static %}
 {% if edit_profile_form %}
-    <form action="{% url 'social:profile' %}?username={{user.username}}" enctype="multipart/form-data" method="POST">
+    <form action="{% url 'social:profile' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         {{edit_profile_form}}
         <input type="submit" value="Update Profile">
     </form>
 {% endif %}
 
-<img src="{{ MEDIA_URL}}avatars/{{user.username}}.jpg" height="200" width="200" alt="Pr1234ofile picture">
+<img src="{{ MEDIA_URL}}avatars/{{user.id}}.jpg" height="200" width="200" alt="Profile picture">
 
 <h1>{{user.username}}</h1>
 <h2>{{user.first_name }} {{user.last_name}}</h2>
