@@ -45,9 +45,9 @@ def user_profile(request):
                 write_file(request.FILES["profile_picture_from_file"],'{}.jpg'.format(settings.MEDIA_ROOT+"/avatars/"+logged_user.id))
             if len(new_password) > 0:
                 logged_user.password = auth.get_password_hash(new_password)
-            logged_user.first_name = profile_form.cleaned_data["first_name"]
-            logged_user.last_name = profile_form.cleaned_data["last_name"]
-            logged_user.about = profile_form.cleaned_data["about"]
+            logged_user.first_name = logged_user.first_name or profile_form.cleaned_data["first_name"]
+            logged_user.last_name = logged_user.last_name or profile_form.cleaned_data["last_name"]
+            logged_user.about = logged_user.about or profile_form.cleaned_data["about"]
             logged_user.save()
         if file_upload_form.is_valid():
             #Upload a new user file, make it private by default

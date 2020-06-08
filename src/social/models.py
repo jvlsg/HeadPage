@@ -16,3 +16,6 @@ class File(models.Model):
     name = models.CharField(max_length=300, default="")
     path = models.CharField(max_length=3000, default="")
     is_public = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return "{} Owned by: {}".format(self.name,self.owner)
