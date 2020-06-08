@@ -9,10 +9,37 @@
         <input type="submit" value="Update Profile">
     </form>
 {% endif %}
+{% if file_upload_form %}
+    <form action="{% url 'social:profile' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+        {{file_upload_form}}
+        <input type="submit" value="Upload File">
+    </form>
+{% endif %}
 
-<img src="{{ MEDIA_URL}}avatars/{{user.id}}.jpg" height="200" width="200" alt="Profile picture">
+<!-- List all user saved PRIVATE Files -->
+<ul>
+    {% for file in user_private_files %}
+    <li> {{file.name}} </li>
+    {% endfor %}
+    <!-- TODO ADD FORMS TO MANAGE EACH FILE -->
+</ul>    
+
+
+
+<img src="{{MEDIA_URL}}avatars/{{user.id}}.jpg" height="200" width="200" alt="Profile picture">
 
 <h1>{{user.username}}</h1>
 <h2>{{user.first_name }} {{user.last_name}}</h2>
+<h3>About {{user.first_name}}</h3>
 <p>{{user.about}}</p>
+
+<!-- List all PUBLIC Files -->
+<h3>Public Files</h3>
+<ul>
+    {% for file in user_public_files %}
+    <li> <a href="{{MEDIA_URL}}{{file.path}}" download> {{file.name}} </a> </li>
+    {% endfor %}
+</ul>
+
 {% endblock %}

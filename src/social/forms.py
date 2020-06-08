@@ -17,4 +17,13 @@ class EditProfileForm(forms.Form):
     about = forms.CharField(label="About", required=False , widget=forms.Textarea)
     profile_picture_from_file = forms.ImageField(label="Upload a Picture", required=False)
     profile_picture_from_url = forms.CharField(label='Or choose a Picture from an URL', required=False, empty_value="")
-    #TODO List of user uploaded files
+
+class FileUploadForm(forms.Form):
+    file_upload = forms.FileField(label="Upload a new File", required=False)
+    file_upload_name = forms.CharField(label='Rename File', max_length=300, required=False)
+    file_upload_is_public = forms.BooleanField(label="Make Public?", required=False)
+    #TODO List of user uploaded files with a booleanField to make public
+
+class FileManagementForm(forms.Form):
+    file_upload_name = forms.CharField(label='Rename File', max_length=300, required=False)
+    file_upload_is_public = forms.BooleanField(label="Make Public?", required=False)
