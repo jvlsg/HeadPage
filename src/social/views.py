@@ -29,7 +29,6 @@ def user_profile(request):
 
     if request.POST and logged_user != None:
         profile_form = EditProfileForm(request.POST,request.FILES)
-        file_upload_form = FileUploadForm(request.POST,request.FILES)
 
         if profile_form.is_valid():
             # There are better ways to check for differences and update a model using a form
@@ -49,16 +48,6 @@ def user_profile(request):
             logged_user.last_name = logged_user.last_name or profile_form.cleaned_data["last_name"]
             logged_user.about = logged_user.about or profile_form.cleaned_data["about"]
             logged_user.save()
-        if file_upload_form.is_valid():
-            #Upload a new user file, make it private by default
-            if request.FILES.get("file_upload",None) != None:
-                file_upload_name = file_upload_form.cleaned_data["file_upload_name"] or request.FILES["file_upload"].name
-                file_upload_is_public = file_upload_form.cleaned_data["file_upload_is_public"]
-                file_upload_path = "/{}/{}/{}".format("files",logged_user.id,file_upload_name)
-                # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                write_file(request.FILES["file_upload"],settings.MEDIA_ROOT+file_upload_path)
-                f = File(name=file_upload_name,owner=logged_user,is_public=file_upload_is_public,path=file_upload_path)
-                f.save()
             
         return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
 
@@ -74,16 +63,47 @@ def user_profile(request):
 
         profile_form = None
         file_upload_form = None
-        user_private_files = []
+        user_file_forms = []
         if logged_user == profile_user:
             profile_form = EditProfileForm(initial= {
                     "first_name":logged_user.first_name,
                     "last_name":logged_user.last_name,
                     "about":logged_user.about,})
             file_upload_form = FileUploadForm()
-            #user_private_files = list(File.objects.raw("SELECT * FROM social_file WHERE owner='{}' AND is_public=FALSE"))
+            user_files = list(File.objects.filter(owner=logged_user.id))
+
+            for f in user_files:
+                user_file_forms.append(FileManagementForm(instance=f))
+
         return render(request, 'social/profile.html', 
-            {'user': profile_user,'edit_profile_form':profile_form,"file_upload_form":file_upload_form ,'user_public_files':user_public_files,'user_private_files':[]})
+            {'user': profile_user,'edit_profile_form':profile_form,"file_upload_form":file_upload_form ,'user_public_files':user_public_files,'user_file_forms':user_file_forms})
+
+def upload_file(request):
+    logged_user = get_user(request.session.get('user_id'))
+    if request.POST and logged_user != None:
+        file_upload_form = FileUploadForm(request.POST,request.FILES)
+        if file_upload_form.is_valid():
+            if request.FILES.get("file_upload",None) != None:
+                file_upload_name = file_upload_form.cleaned_data["file_upload_name"] or request.FILES["file_upload"].name
+                file_upload_is_public = file_upload_form.cleaned_data["file_upload_is_public"]
+                file_upload_path = "/{}/{}/{}".format("files",logged_user.id,file_upload_name)
+                # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
+                write_file(request.FILES["file_upload"],settings.MEDIA_ROOT+file_upload_path)
+                f = File(name=file_upload_name,owner=logged_user,is_public=file_upload_is_public,path=file_upload_path)
+                f.save()
+        return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
+
+def edit_file(request):
+    #TODO check for user login(?) , rename the file
+    logged_user = get_user(request.session.get('user_id'))
+    original_file = File.objects.get(id=request.GET.get("id"))
+    updated_file = FileManagementForm(request.POST,instance = original_file)
+    updated_file.save()
+    return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
+
+def delete_file(request):
+    pass
+
 
 def register(request):
     if request.method == 'POST':

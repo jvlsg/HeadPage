@@ -1,4 +1,5 @@
 from django import forms
+from .models import File
 
 class RegisterForm(forms.Form):
     username = forms.CharField(label='Username', max_length=16, required=True)
@@ -24,6 +25,11 @@ class FileUploadForm(forms.Form):
     file_upload_is_public = forms.BooleanField(label="Make Public?", required=False)
     #TODO List of user uploaded files with a booleanField to make public
 
-class FileManagementForm(forms.Form):
-    file_upload_name = forms.CharField(label='Rename File', max_length=300, required=False)
-    file_upload_is_public = forms.BooleanField(label="Make Public?", required=False)
+class FileManagementForm(forms.ModelForm):
+    class Meta:
+        model = File
+        fields = ['name', 'is_public','owner','path']
+        widgets = {
+            "owner": forms.HiddenInput(),
+            "path": forms.HiddenInput(),
+        }
