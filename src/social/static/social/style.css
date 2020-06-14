@@ -141,8 +141,8 @@ background-color: #413b97;
 
 .warning {
     width: 100%;
-    background-color:#f44336;
-    color: white;
+    background-color:#f44336 !important;
+    color: white !important;
     padding: 14px 20px;
     margin: 8px 0;
     border: none;
@@ -150,5 +150,20 @@ background-color: #413b97;
     cursor: pointer;
     }
 .warning:hover {
-    background-color: #ba000d;
+    background-color: #ba000d !important;
+}
+
+
+
+.optional {
+    background-color:#77cc4d !important;
+    color: white !important;
+    padding: 5px 5px;
+    margin: 10px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+.optional:hover {
+    background-color: #4dcc62 !important;
 }

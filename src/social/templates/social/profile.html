@@ -28,6 +28,7 @@
         <!-- List all user saved Files -->
         {% for form in user_file_forms %}
             <div class="line_form">
+                <a class="optional" href="{{MEDIA_URL}}{{form.instance.path}}">⤋</a> 
                 <form class="line_form" action="{% url 'social:edit_file' %}?id={{form.instance.id}}" method="POST">
                     {% csrf_token %}
                     {{form}}
