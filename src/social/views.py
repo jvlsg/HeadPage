@@ -10,7 +10,7 @@ import subprocess
 import os
 from django.db import connection
 from .auth import authenticate_user, get_user
-from .storage import write_file
+from . import storage
 
 class IndexView(generic.ListView):
     template_name = 'social/index.html'
@@ -36,12 +36,12 @@ def user_profile(request):
             pic_url = profile_form.cleaned_data["profile_picture_from_url"]
             new_password = profile_form.cleaned_data["password"]
             if len(pic_url)>0:
-                # +++ VULNERABLE TO REMOTE CODE EXECUTION +++
+                # +++ VULNERABLE TO RCE (REMOTE CODE EXECUTION) +++
                 subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.id), shell=True)
             #File uploaded in the field
             elif request.FILES.get("profile_picture_from_file",None) != None:
                 # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                write_file(request.FILES["profile_picture_from_file"],'{}.jpg'.format(settings.MEDIA_ROOT+"/avatars/"+logged_user.id))
+                storage.write_file(request.FILES["profile_picture_from_file"],"/avatars/"+logged_user.id+'.jpg')
             if len(new_password) > 0:
                 logged_user.password = auth.get_password_hash(new_password)
             logged_user.first_name = logged_user.first_name or profile_form.cleaned_data["first_name"]
@@ -86,9 +86,9 @@ def upload_file(request):
             if request.FILES.get("file_upload",None) != None:
                 file_upload_name = file_upload_form.cleaned_data["file_upload_name"] or request.FILES["file_upload"].name
                 file_upload_is_public = file_upload_form.cleaned_data["file_upload_is_public"]
-                file_upload_path = "/{}/{}/{}".format("files",logged_user.id,file_upload_name)
+                file_upload_path = "{}/{}/{}".format("files",logged_user.id,file_upload_name)
                 # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                write_file(request.FILES["file_upload"],settings.MEDIA_ROOT+file_upload_path)
+                storage.write_file(request.FILES["file_upload"],file_upload_path)
                 f = File(name=file_upload_name,owner=logged_user,is_public=file_upload_is_public,path=file_upload_path)
                 f.save()
         return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
@@ -96,13 +96,33 @@ def upload_file(request):
 def edit_file(request):
     #TODO check for user login(?) , rename the file
     logged_user = get_user(request.session.get('user_id'))
-    original_file = File.objects.get(id=request.GET.get("id"))
-    updated_file = FileManagementForm(request.POST,instance = original_file)
-    updated_file.save()
-    return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
+    if request.POST and logged_user != None:
+        file = File.objects.get(id=request.GET.get("id"))
+        old_name = file.name
+        old_path = file.path
+
+        edit_form = FileManagementForm(request.POST,instance = file)
+        edit_form.save()
+        
+        if old_name != file.name:
+            file.path=file.path.replace(old_name,file.name)
+            storage.move_file(old_path,file.path)
+
+        file.save()
+        return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
 
 def delete_file(request):
-    pass
+    logged_user = get_user(request.session.get('user_id'))
+    if request.POST and logged_user != None:
+        try:
+            original_file = File.objects.get(id=request.GET.get("id"),owner=logged_user)
+        except expression as identifier:
+            #TODO don't return a 404, but a decent error message
+            raise Http404("File does not exist")
+        finally:
+            storage.delete_file(original_file.path)
+            original_file.delete()
+            return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
 
 
 def register(request):

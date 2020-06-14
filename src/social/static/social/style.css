@@ -32,6 +32,11 @@ font-family: Arial, Helvetica, sans-serif;
     width: 50%
 }
 
+.horizontal_halves{
+    display: flex;
+    padding: 10px;
+}
+
 .left_half {
     margin-right: auto;
     width: 50%
@@ -43,8 +48,7 @@ font-family: Arial, Helvetica, sans-serif;
 }
 
 .line_form{
-    display: flex;
-    padding: 10px;
+    display: inline-flex;
 }
 
 /* Create two columns/boxes that floats next to each other */

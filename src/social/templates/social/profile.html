@@ -3,45 +3,48 @@
 {% block content %}
 {% load static %}
 
-<div class="line_form">
-
-    {% if edit_profile_form %}
-        <form class="left_half" action="{% url 'social:profile' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
+{% if edit_profile_form %}
+<div class="horizontal_halves">
+    <div class="left_half">
+        <form class="center" action="{% url 'social:profile' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
             <h3>Edit File</h3>
             {% csrf_token %}
             {{edit_profile_form}}
             <input type="submit" value="Update Profile">
         </form>
-    {% endif %}
+    </div>
 
-    {% if file_upload_form %}    
     <div class="right_half" >
         <h3>Upload File</h3>
-            <form action="{% url 'social:upload_file' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
-                {% csrf_token %}
-                {{file_upload_form}}
-                <input type="submit" value="Upload File">
-            </form>
-    {% endif %}
+        <form class="line_form" action="{% url 'social:upload_file' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            {{file_upload_form}}
+            <input type="submit" value="Upload File">
+        </form>
 
-    {% if user_file_forms %}
         <hr/>
         <h3>Current Files</h3>
 
         <!-- List all user saved Files -->
         {% for form in user_file_forms %}
-            <!-- TODO create a new view to update / delete file -->
-            <form class="line_form" action="{% url 'social:edit_file' %}?id={{form.instance.id}}" enctype="multipart/form-data" method="POST">
-                {% csrf_token %}
-                {{form}}
-                <input type="submit" value="Update File">
-                <a class="warning" href="{% url 'social:delete_file' %}?id={{user.id}}">Delete File</a>
-            </form>
+            <div class="line_form">
+                <form class="line_form" action="{% url 'social:edit_file' %}?id={{form.instance.id}}" method="POST">
+                    {% csrf_token %}
+                    {{form}}
+                    <input type="submit" value="Update File">
+                    <!-- <a class="warning" href="{% url 'social:delete_file' %}?id={{form.instance.id}}">Delete File</a> -->
+                </form>
+                <form action="{% url 'social:delete_file' %}?id={{form.instance.id}}" method="POST">
+                    {% csrf_token %}
+                    <input class="warning" type="submit" value="Delete File">
+                </form>
+            </div>
         {% endfor %}
-        <!-- TODO ADD FORMS TO MANAGE EACH FILE -->
     </div>
-    {% endif %}
 </div>
+<hr>
+{% endif %}
+
 <div class="center">
     <img src="{{MEDIA_URL}}avatars/{{user.id}}.jpg" height="200" width="200" alt="Profile picture">
 
