@@ -1,0 +1,12 @@
+{% extends 'social/base.html' %}
+{% block title %} Register {% endblock %}
+
+{% block content %}
+<form class="center" action="{% url 'social:register' %}" method="POST">
+    <!-- TODO +++ VULNERABLE TO CSRF +++ -->
+    {% csrf_token %}
+    {{form}}
+    {{error_message}}
+    <input type="submit" value="Register !">
+</form>
+{% endblock %}

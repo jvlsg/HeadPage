@@ -1,0 +1,37 @@
+{% autoescape off %} <!-- +++ THIS WILL MAKE THE SITE VULNERABLE TO XSS +++ -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css"  href="{% static "social/style.css" %}">
+    <title>{% block title %}HeadPage{% endblock %}</title>
+
+</head>
+
+<body>
+    <div class="nav">
+        {% block sidebar %}
+        <ul class="nav">
+            <l1><a class="nav" href="{% url 'social:index' %}">Home</a></l1>
+            <l1>{% if request.session.user_id == None %}</l1>
+            <l1><a class="nav" href="{% url 'social:login' %}?redirect={{request.get_full_path}}">Log-in</a></l1>
+            <l1><a class="nav" href="{% url 'social:register' %}?redirect={{request.get_full_path}}">Sign-up</a></l1>
+            <l1>{% else %}</l1>
+            <l1><a class="nav" href="{% url 'social:profile'%}?userid={{request.session.user_id}}">Profile</a></l1>
+            <l1><a class="nav" href="{% url 'social:logout'%}?redirect={{request.get_full_path}}">Log-out</a></l1>
+            <l1>{% endif %}</l1>
+        </ul>
+        {% endblock %}
+    </div>
+
+    <div id="content" class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+
+<div class="footer">
+    <p>Copyleft© 2020 DudeTrustUs Inc. No Rights Reserved</p>
+    <a href="static/?file=privacy.txt">Privacy Policty</a>
+  </div>
+{% endautoescape %} 

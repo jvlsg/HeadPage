@@ -1,0 +1,66 @@
+{% extends 'social/base.html' %}
+{% block title %} {{user.username}}'s profile{% endblock %}
+{% block content %}
+{% load static %}
+
+{% if edit_profile_form %}
+<div class="horizontal_halves">
+    <div class="left_half">
+        <form class="center" action="{% url 'social:profile' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
+            <h3>Edit File</h3>
+            {% csrf_token %}
+            {{edit_profile_form}}
+            <input type="submit" value="Update Profile">
+        </form>
+    </div>
+
+    <div class="right_half" >
+        <h3>Upload File</h3>
+        <form class="line_form" action="{% url 'social:upload_file' %}?id={{user.id}}" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            {{file_upload_form}}
+            <input type="submit" value="Upload File">
+        </form>
+
+        <hr/>
+        <h3>Current Files</h3>
+
+        <!-- List all user saved Files -->
+        {% for form in user_file_forms %}
+            <div class="line_form">
+                <a class="optional" href="{{MEDIA_URL}}{{form.instance.path}}">⤋</a> 
+                <form class="line_form" action="{% url 'social:edit_file' %}?id={{form.instance.id}}" method="POST">
+                    {% csrf_token %}
+                    {{form}}
+                    <input type="submit" value="Update File">
+                    <!-- <a class="warning" href="{% url 'social:delete_file' %}?id={{form.instance.id}}">Delete File</a> -->
+                </form>
+                <form action="{% url 'social:delete_file' %}?id={{form.instance.id}}" method="POST">
+                    {% csrf_token %}
+                    <input class="warning" type="submit" value="Delete File">
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<hr>
+{% endif %}
+
+<div class="center">
+    <img src="{{MEDIA_URL}}avatars/{{user.id}}.jpg" height="200" width="200" alt="Profile picture">
+
+    <h1>{{user.username}}</h1>
+    <h2>{{user.first_name }} {{user.last_name}}</h2>
+    <h3>About {{user.first_name}}</h3>
+    <p>{{user.about}}</p>
+
+    <!-- List all PUBLIC Files -->
+    <h3>Public Files</h3>
+    <ul>
+        {% for file in user_public_files %}
+        <li> <a href="{{MEDIA_URL}}{{file.path}}" download> {{file.name}} </a> </li>
+        {% endfor %}
+    </ul>
+
+    {% endblock %}
+</div>

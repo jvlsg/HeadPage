@@ -1,0 +1,67 @@
+[
+  {
+    "model": "social.user",
+    "pk": 1,
+    "fields": {
+      "first_name" : "Arnaldo",
+      "last_name" : "Bernaldo",
+      "username" : "mega_mano",
+      "password": "d9e7dc7f09854cc2453134c5b961726e6a12aa76",
+      "about": "I like trains"
+    }
+  },
+  {
+    "model": "social.user",
+    "pk": 2,
+    "fields": {
+      "first_name" : "Cernalda",
+      "last_name" : "Bernaldo",
+      "username" : "mega_mana",
+      "password": "9ebb8fa1ad5e0abd518bd209761ce7b73925b4f4",
+      "about": "I like wagons"
+    }
+  },
+  {
+    "model": "social.user",
+    "pk": 3,
+    "fields": {
+      "first_name" : "Mysterious",
+      "last_name" : "Man",
+      "username" : "mystery",
+      "password": "b12f6eda7716082c3ee62e9e124991439a7ca729",
+      "about": 
+      "Good day. Despite the necessity that we, as humans, have to socialize with one another, I became vexed upon realizing the amount of power and personal information that the institutions responsible for hosting and operating social networks. Instead of recluding to a state of hermitism, I opted to hide any details of my identity, in such a way as to make a political and social statement on the current way we interact. I invite others to reflect on this issue and take action according to their own conclusions and moral principles."
+    }
+  },
+  {
+    "model": "social.user",
+    "pk": 4,
+    "fields": {
+      "first_name" : "Ian Isaac",
+      "last_name" : "Jorge Ferreira",
+      "username" : "Ariyes",
+      "password": "ef0ebbb77298e1fbd81f756a4efc35b977c93dae",
+      "about": "Hi There!"
+    }
+  },
+  {
+    "model": "social.file",
+    "pk": 1,
+    "fields": {
+      "name" : "arnaldo_todo.txt",
+      "path" : "files/1/arnaldo_todo.txt",
+      "owner" : 1,
+      "is_public": true
+    }
+  },
+  {
+    "model": "social.file",
+    "pk": 2,
+    "fields": {
+      "name" : "best_girl.jpg",
+      "path" : "files/3/best_girl.jpg",
+      "owner" : 3,
+      "is_public": false
+    }
+  }    
+]

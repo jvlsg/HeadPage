@@ -1,0 +1,23 @@
+{% extends 'social/base.html' %}
+<!-- {% load static %} -->
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'poll/style.css' %}"> -->
+{% block title %} Welcome to Headpage {% endblock %}
+
+{% block content %}
+    {% if users_alphabetical_list %}
+        <ul class="center">
+        {% for user in users_alphabetical_list %}
+            <!-- Search for a URLConf path with the name 'profile', pass the function/method it calls the argument user.username -->
+            <!-- <li> <a href="{#% url 'social:profile' user.username %#}"> -->
+            <li style="list-style-type: none"> 
+                <a class="user_list_item" href="profile/?userid={{user.id}}"> 
+                    <img src="{{MEDIA_URL}}avatars/{{user.id}}.jpg" height="5%" width="5%" alt="Profile picture">
+                    {{user.username}} ({{user.last_name}}, {{user.first_name}})
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found!.</p>
+    {% endif %}
+{% endblock %}
