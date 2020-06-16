@@ -129,8 +129,7 @@ def static(request):
     if request.GET:
         #+++VULNERABLE TO PATH TRANSVERSAL+++
         # This is a pretty forced example, but it does demonstrate the vulnerability in itself
-        #path = os.path.join(settings.BASE_DIR,"social/static/social/",request.GET.get("file")) #Do
-        path = settings.BASE_DIR+"/social/static/social/"+request.GET.get("file") #Don't
+        path = os.path.join(settings.BASE_DIR,"social/static/social/",request.GET.get("file"))
         file = open(path,"rb")
         response = HttpResponse(file, content_type=mimetypes.guess_type(path)[0])
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(request.GET.get("file"))

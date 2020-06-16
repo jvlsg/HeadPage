@@ -1,4 +1,4 @@
-# Headpage (WIP)
+# Headpage
 
 A Simple and porpousely vulnerable django web-application for testing and learning
 
@@ -9,44 +9,27 @@ A Simple and porpousely vulnerable django web-application for testing and learni
 
 ## Main Vulnerabilities
 
-### Illegal File Access
-* Profile pictures are stored as static files in the site with standardized name `(username)_avatar`. They appear in the User's profile as a thumbnail. "Full Resolution" pictures are accessible by using their filename, e.g. `headpage.example/social/static?file=user1_avatar.jpg` The `file` in the GET is not properly validated/sanitized
-
 ### SQL Injection
-* User pages are accessible using paramters "headpage.example/user?id=1". The parameter is used in a raw SQL SELECT, to load the user's data for the page
-* Login screen also pass login and password as GET parameters that are not sanitized
+* Login and Register user forms use raw, unsanitized SQL queries and are subject to injection via trailing comment and `'` to close strings
+    * E.g. username: `mega_mano'--`
 
-### Remote Code Execution
-* (based on the django.nV injection vuln) The user can upload a file and give an arbitrary name (or rename already uploaded files). When first uploaded the files are stored in a temporary folder, before being moved to a `userfiles` folder by invoking `mv` from the `os`. The rename is also done with `mv`. This process is vulnerable to code injection in the new file name, or replacing an existing program with a malicious version, such as `/bin/ls`
-* The user can choose a picture already uploaded for his profile    , or download an image from a URL. The download done by invoking `wget` without escaping the user input or validating the filetype. 
+### XSS
+* The user's first/last name or username are not sanitized and are displayed on their profile.
+    *  E.g. username: `<script>alert("!!")</script>`
+
+### CSRF
+* To be Implemented (?)
 
 ### Open Redirect
-* When clicking the link to the login page from a previous page, the previous Page URL is sent as a Parameter for a redirection back to the previous page after loging in. The redirection URL is not validated. E.g. in the index, the link goes to headpage.example/login?redirect=headpage.example/index 
-`if(valid(request.getParameter("usr"),request.getParameter("pwd"))) response.sendRedirect(request.getParameter("redirect"));`
+* When clicking the link to the login/register page from a previous page, the previous Page URL is sent as a Parameter for a redirection back to the previous page after loging in/registering. The redirection URL is not validated.
+    * E.g. 127.0.0.1:8000/social/login/?redirect=evilsite.url
 
+### Remote Code Execution
+* The user can choose a picture already uploaded for his profile, or download an image from a URL. The download is done by invoking `wget` without escaping the user input
+* (based on the django.nV injection vuln) The user can upload a file and give an arbitrary name (or rename already uploaded files). The rename is done with `mv`. This process is vulnerable to code injection in the new file name, or replacing an existing program with a malicious version
 
 ### Malicious File Upload
-* Upload malware as pictures, the site does not validate filetype
-## Database Models
+* There is no file checking on user uploaded files, or URL downloads.
 
-### User
-Self-explanatory
-* `username`
-* `password` (SHA-1 , unsalted)
-* `files`
-* `name`
-* `about`
-
-### Files
-User submited files (Shamelessly copying this idea from django.nV)
-* `name`
-* `path`
-* `is_public`
-
-## Views
-### Index
-Listing all Users (Maybe afterwards paging and a (vulnerable) search bar)
-### User profile
-The static page where the user information is shown
-### Login screen 
-### Edit profile
+### Illegal File Access / Path Traversal
+* Some static files are returned after GET requests `127.0.0.1:8000/social/static/?file=privacy.txt` The `file` in the GET is not properly validated/sanitized
