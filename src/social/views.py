@@ -9,8 +9,9 @@ from .forms import RegisterForm, LoginForm, EditProfileForm, FileUploadForm, Fil
 import subprocess
 import os
 from django.db import connection
-from .auth import authenticate_user, get_user
+from .auth import authenticate_user, get_user, get_password_hash
 from . import storage
+import mimetypes
 
 class IndexView(generic.ListView):
     template_name = 'social/index.html'
@@ -37,13 +38,13 @@ def user_profile(request):
             new_password = profile_form.cleaned_data["password"]
             if len(pic_url)>0:
                 # +++ VULNERABLE TO RCE (REMOTE CODE EXECUTION) +++
-                subprocess.run( "wget {} -O {}.jpg".format(pic_url,settings.MEDIA_ROOT+"/avatars/"+logged_user.id), shell=True)
+                subprocess.run( "wget {} -O {}{}{}.jpg".format(pic_url, settings.MEDIA_ROOT,"/avatars/",str(logged_user.id)), shell=True)
             #File uploaded in the field
             elif request.FILES.get("profile_picture_from_file",None) != None:
                 # +++ VULNERABLE TO Unrestricted Upload of File with Dangerous Type +++
-                storage.write_file(request.FILES["profile_picture_from_file"],"/avatars/"+logged_user.id+'.jpg')
+                storage.write_file(request.FILES["profile_picture_from_file"],"{}{}.jpg".format("/avatars/",str(logged_user.id)))
             if len(new_password) > 0:
-                logged_user.password = auth.get_password_hash(new_password)
+                logged_user.password = get_password_hash(new_password)
             logged_user.first_name = logged_user.first_name or profile_form.cleaned_data["first_name"]
             logged_user.last_name = logged_user.last_name or profile_form.cleaned_data["last_name"]
             logged_user.about = logged_user.about or profile_form.cleaned_data["about"]
@@ -124,12 +125,23 @@ def delete_file(request):
             original_file.delete()
             return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
 
+def static(request):
+    if request.GET:
+        #+++VULNERABLE TO PATH TRANSVERSAL+++
+        # This is a pretty forced example, but it does demonstrate the vulnerability in itself
+        #path = os.path.join(settings.BASE_DIR,"social/static/social/",request.GET.get("file")) #Do
+        path = settings.BASE_DIR+"/social/static/social/"+request.GET.get("file") #Don't
+        file = open(path,"rb")
+        response = HttpResponse(file, content_type=mimetypes.guess_type(path)[0])
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(request.GET.get("file"))
+        return response
 
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         error_message = ""
-        url_to_redirect = request.POST.get("redirect")
+        #+++ VULNERABLE TO UNVALIDATED REDIRECTS +++
+        url_to_redirect = request.session.pop("login_redirect",reverse('social:index'))
         if form.is_valid():
             curs = connection.cursor()
 
@@ -138,7 +150,7 @@ def register(request):
             last_name=request.POST.get('last_name')
 
             #+++ PASSWORD HASHED ON THE SERVERSIDE +++
-            password=auth.get_password_hash(request.POST.get('password'))
+            password=get_password_hash(request.POST.get('password'))
             try:
                 # +++ VULNERABLE TO SQL INJECTION +++
                 curs.executescript(
@@ -152,6 +164,8 @@ def register(request):
                 form = RegisterForm()
                 error_message="ERROR! Username already taken!\n{}".format(e)
     else:
+        if(request.GET.get("redirect")):
+            request.session["login_redirect"] = request.GET.get("redirect")
         form = RegisterForm()
         error_message=""
     return render(request,'social/register.html',{'form': form,"error_message":error_message})
