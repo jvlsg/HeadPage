@@ -12,18 +12,13 @@ def get_password_hash(password):
 
 def authenticate_user(username,password):
     """
-    This is a warped clone of an authenticate as defined in the 
+    This is a warped clone of an 'authenticate' as defined in the django docs
     """
-    password=hashlib.sha1(password.encode()).hexdigest()
+    password=get_password_hash(password)
     try:
         # +++ VULNERABLE TO SQL INJECTION +++
         q = list(User.objects.raw("SELECT * FROM social_user WHERE username='{}' AND password='{}' LIMIT 1".format(username,password)))
         return q[0]
-        # if len(q) > 0:
-            # request.session['social_user'] = q[0].id
-            # print(vars(request))
-        # TODO Get last page accessed
-        # return HttpResponseRedirect(reverse('social:index'))
     #Generic exception = bad practice!
     except Exception as e:
         print(e)
