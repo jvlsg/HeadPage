@@ -1,4 +1,4 @@
-# Headpage
+# HeadPage
 
 A Simple and porpousely vulnerable django web-application for testing and learning
 
@@ -7,7 +7,7 @@ A Simple and porpousely vulnerable django web-application for testing and learni
 
 ## Idea
 
-* Create a social-media-like (Headpage != Facebook) web application with a relatively small, and vulnerable, code base. 
+* Create a social-media-like (HeadPage != Facebook) web application with a relatively small, and vulnerable, code base. 
 * Users create public profiles, upload files for public (such as photos)or private (such as pdfs) use and browse other users' profiles.
 
 ## Running 
@@ -21,7 +21,7 @@ Otherwise, install the dependencies on `requirements.txt` and run the default dj
 
 ## Allowing connections other than localhost
 
-Change the following line on `src/headpage/settings.py` to serve Headpage on all interfaces. This can be dangerous, if possible run inside a VM on Host-Only interface.
+Change the following line on `src/headpage/settings.py` to serve HeadPage on all interfaces. This can be dangerous, if possible run inside a VM on Host-Only interface.
 
 `ALLOWED_HOSTS = ['*']`
 
