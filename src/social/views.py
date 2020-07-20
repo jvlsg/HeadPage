@@ -20,7 +20,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published questions."""
         try:
-            return User.objects.order_by('username')[:5]
+            return User.objects.order_by('username')
         except django.db.utils.OperationalError:
             return None
 
