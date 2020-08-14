@@ -45,9 +45,9 @@ def user_profile(request):
                 storage.write_file(request.FILES["profile_picture_from_file"],"{}{}.jpg".format("/avatars/",str(logged_user.id)))
             if len(new_password) > 0:
                 logged_user.password = get_password_hash(new_password)
-            logged_user.first_name = logged_user.first_name or profile_form.cleaned_data["first_name"]
-            logged_user.last_name = logged_user.last_name or profile_form.cleaned_data["last_name"]
-            logged_user.about = logged_user.about or profile_form.cleaned_data["about"]
+            logged_user.first_name = profile_form.cleaned_data["first_name"]
+            logged_user.last_name = profile_form.cleaned_data["last_name"]
+            logged_user.about = profile_form.cleaned_data["about"]
             logged_user.save()
             
         return redirect(reverse("social:profile")+"?userid={}".format(logged_user.id))
@@ -117,7 +117,7 @@ def delete_file(request):
     if request.POST and logged_user != None:
         try:
             original_file = File.objects.get(id=request.GET.get("id"),owner=logged_user)
-        except expression as identifier:
+        except:
             #TODO don't return a 404, but a decent error message
             raise Http404("File does not exist")
         finally:
